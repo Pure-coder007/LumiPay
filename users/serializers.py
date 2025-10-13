@@ -1,8 +1,7 @@
+from django.db import transaction
 from rest_framework import serializers
 from .models import User
-import random
 from rest_framework.exceptions import ValidationError
-from rest_framework.authtoken.models import Token
 
 
 class RegisterUserSerializer(serializers.ModelSerializer):
@@ -13,11 +12,15 @@ class RegisterUserSerializer(serializers.ModelSerializer):
     account_number = serializers.CharField(max_length=10, read_only=True)
     password = serializers.CharField(write_only=True, max_length=20, min_length=8)
     confirm_password = serializers.CharField(write_only=True, max_length=20, min_length=8)
+    pin = serializers.CharField(write_only=True, min_length=4, max_length=6)
+    confirm_pin = serializers.CharField(write_only=True, min_length=4, max_length=6)
 
     class Meta:
         model = User
-        fields = ['first_name', 'last_name', 'email', 'phone_number', 'account_number', 'password', 'confirm_password']
-
+        fields = [
+            'first_name', 'last_name', 'email', 'phone_number', 'account_number',
+            'password', 'confirm_password', 'pin', 'confirm_pin'
+        ]
 
     def validate(self, attrs):
         if User.objects.filter(email=attrs['email']).exists():
@@ -26,12 +29,28 @@ class RegisterUserSerializer(serializers.ModelSerializer):
             raise ValidationError("Phone number already exists")
         if attrs['password'] != attrs['confirm_password']:
             raise ValidationError("Passwords do not match")
-        if len(attrs['phone_number']) != 15 or not attrs['phone_number'].startswith('+234'):
-            raise ValidationError("Phone number must start with +234 and must be 15 characters long")
+        if len(attrs['phone_number']) != 14 or not attrs['phone_number'].startswith('+234'):
+            raise ValidationError("Phone number must start with +234 and must be 14 characters long")
+        if attrs['pin'] != attrs['confirm_pin']:
+            raise ValidationError("PINs do not match")
+        if len(attrs['pin']) != 6:
+            raise ValidationError("PIN must be 6 characters long")
         return attrs
 
     def create(self, validated_data):
+        validated_data.pop('confirm_pin')
         validated_data.pop('confirm_password')
-        user = User.objects.create_user(**validated_data)
-        Token.objects.create(user=user)
-        return user
+        password = validated_data.pop('password')
+        pin = validated_data.pop('pin')
+
+        try:
+            with transaction.atomic():
+                user = User.objects.create(**validated_data)
+                user.set_password(password)
+                user.set_pin(pin)
+                user.account_number = User.objects.generate_account_number()
+                user.save()
+                return user
+        except Exception as e:
+            # Optional: log or raise a clear error
+            raise ValidationError(f"Registration failed: {str(e)}")
