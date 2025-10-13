@@ -10,6 +10,8 @@ from rest_framework.authtoken.models import Token
 from .tokens import create_jwt_pair
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.permissions import AllowAny
+from .throttles import LoginRateThrottle
+from rest_framework.throttling import ScopedRateThrottle
 
 
 class RegisterUserView(generics.CreateAPIView):
@@ -38,6 +40,8 @@ class RegisterUserView(generics.CreateAPIView):
 
 class UserLoginView(APIView):
     permission_classes = [AllowAny]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = 'login'
     def post(self, request):
         email = request.data.get("email")
         password = request.data.get("password")

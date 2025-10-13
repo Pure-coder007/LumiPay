@@ -35,6 +35,7 @@ INSTALLED_APPS = [
 
     # Local apps
     "users",
+    "security",
 
     # Third-party apps
     "rest_framework",
@@ -57,7 +58,21 @@ REST_FRAMEWORK = {
         "DEFAULT_PERMISSION_CLASSES":(
             "rest_framework.permissions.IsAuthenticated",
             # "rest_framework.permissions.AllowAny",
-        )
+        ),
+
+    # 🚦 Throttling config
+        "DEFAULT_THROTTLE_CLASSES": [
+            "rest_framework.throttling.UserRateThrottle",
+            "rest_framework.throttling.AnonRateThrottle",
+        ],
+
+        "DEFAULT_THROTTLE_RATES": {
+            "anon": "5/minute",   # Unauthenticated users
+            "user": "10/minute",  # Authenticated users
+            "login": "3/minute",  # Custom for login endpoint
+        },
+
+        "EXCEPTION_HANDLER": "users.exceptions.custom_exception_handler",
 }
 
 
