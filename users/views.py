@@ -1,6 +1,6 @@
 from http.client import responses
 from django.shortcuts import render
-from .serializers import RegisterUserSerializer
+from .serializers import RegisterUserSerializer, UserProfileSerializer
 from django.contrib.auth import authenticate
 from rest_framework import generics, status
 from rest_framework.response import Response
@@ -8,6 +8,7 @@ from rest_framework.request import Request
 from rest_framework.views import APIView
 from rest_framework.authtoken.models import Token
 from .tokens import create_jwt_pair
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.permissions import AllowAny
 
 
@@ -66,3 +67,17 @@ class UserLoginView(APIView):
 
 
 
+
+
+
+class UserProfileView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request: Request):
+        user = request.user
+        serializer = UserProfileSerializer(user, context={"request": request})
+        response = {
+            "message": "User profile fetched successfully",
+            "data": serializer.data
+        }
+        return Response(data=response, status=status.HTTP_200_OK)

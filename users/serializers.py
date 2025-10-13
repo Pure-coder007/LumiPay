@@ -62,38 +62,31 @@ class RegisterUserSerializer(serializers.ModelSerializer):
 
 
 
-# class LoginUserSerializer(serializers.Serializer):
-#     email = serializers.EmailField()
-#     password = serializers.CharField(write_only=True)
-#
-#     # Fields returned in response
-#     token = serializers.CharField(read_only=True)
-#     first_name = serializers.CharField(read_only=True)
-#     last_name = serializers.CharField(read_only=True)
-#     phone_number = serializers.CharField(read_only=True)
-#     account_number = serializers.CharField(read_only=True)
-#     balance = serializers.DecimalField(read_only=True, max_digits=12, decimal_places=2)
-#     kyc_verified = serializers.BooleanField(read_only=True)
-#
-#     def validate(self, attrs):
-#         email = attrs.get("email")
-#         password = attrs.get("password")
-#
-#         # Authenticate using email and password
-#         user = authenticate(email=email, password=password)
-#         if not user:
-#             raise AuthenticationFailed("Invalid email or password")
-#
-#         # Create or retrieve auth token
-#         token, _ = Token.objects.get_or_create(user=user)
-#
-#         return {
-#             "token": token.key,
-#             "email": user.email,
-#             "first_name": user.first_name,
-#             "last_name": user.last_name,
-#             "phone_number": user.phone_number,
-#             "account_number": user.account_number,
-#             "balance": user.balance,
-#             "kyc_verified": getattr(user, "kyc_verified", False),
-#         }
+
+class UserProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = [
+            "id",
+            "first_name",
+            "last_name",
+            "email",
+            "phone_number",
+            "account_number",
+            "balance",
+            "currency",
+            "kyc_status",
+            "is_verified",
+            "is_active",
+            "profile_picture",
+            "date_joined",
+            "updated_at"
+        ]
+        read_only_fields = [
+            "email",
+            "account_number",
+            "balance",
+            "currency",
+            "date_joined",
+            "updated_at",
+        ]
