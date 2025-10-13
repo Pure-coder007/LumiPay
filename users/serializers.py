@@ -2,6 +2,9 @@ from django.db import transaction
 from rest_framework import serializers
 from .models import User
 from rest_framework.exceptions import ValidationError
+from rest_framework.exceptions import AuthenticationFailed
+from rest_framework.authtoken.models import Token
+from django.contrib.auth import authenticate
 
 
 class RegisterUserSerializer(serializers.ModelSerializer):
@@ -54,3 +57,43 @@ class RegisterUserSerializer(serializers.ModelSerializer):
         except Exception as e:
             # Optional: log or raise a clear error
             raise ValidationError(f"Registration failed: {str(e)}")
+
+
+
+
+
+# class LoginUserSerializer(serializers.Serializer):
+#     email = serializers.EmailField()
+#     password = serializers.CharField(write_only=True)
+#
+#     # Fields returned in response
+#     token = serializers.CharField(read_only=True)
+#     first_name = serializers.CharField(read_only=True)
+#     last_name = serializers.CharField(read_only=True)
+#     phone_number = serializers.CharField(read_only=True)
+#     account_number = serializers.CharField(read_only=True)
+#     balance = serializers.DecimalField(read_only=True, max_digits=12, decimal_places=2)
+#     kyc_verified = serializers.BooleanField(read_only=True)
+#
+#     def validate(self, attrs):
+#         email = attrs.get("email")
+#         password = attrs.get("password")
+#
+#         # Authenticate using email and password
+#         user = authenticate(email=email, password=password)
+#         if not user:
+#             raise AuthenticationFailed("Invalid email or password")
+#
+#         # Create or retrieve auth token
+#         token, _ = Token.objects.get_or_create(user=user)
+#
+#         return {
+#             "token": token.key,
+#             "email": user.email,
+#             "first_name": user.first_name,
+#             "last_name": user.last_name,
+#             "phone_number": user.phone_number,
+#             "account_number": user.account_number,
+#             "balance": user.balance,
+#             "kyc_verified": getattr(user, "kyc_verified", False),
+#         }
