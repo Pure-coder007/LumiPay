@@ -9,7 +9,7 @@ class ThrottleLog(models.Model):
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        related_name="throttle_logs"
+        related_name="throttle_logs",
     )
     ip_address = models.GenericIPAddressField(null=True, blank=True, db_index=True)
     endpoint = models.CharField(max_length=255, db_index=True)

@@ -7,7 +7,7 @@ from django.contrib.auth.hashers import make_password, check_password
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
         if not email:
-            raise ValueError('The Email field must have a valid email')
+            raise ValueError("The Email field must have a valid email")
 
         email = self.normalize_email(email)
         extra_fields.setdefault("is_active", True)
@@ -30,7 +30,7 @@ class CustomUserManager(BaseUserManager):
 
     def generate_account_number(self):
         while True:
-            account_number = ''.join(random.choices(string.digits, k=10))
+            account_number = "".join(random.choices(string.digits, k=10))
             if not User.objects.filter(account_number=account_number).exists():
                 return account_number
 
@@ -46,11 +46,10 @@ class User(AbstractUser):
     phone_number = models.CharField(max_length=15, blank=False, unique=True)
     account_number = models.CharField(max_length=10, unique=True, blank=False)
 
-
     currency = models.CharField(
         max_length=5,
-        choices=[('NGN', 'Naira'), ('USD', 'Dollar'), ('EUR', 'Euro')],
-        default='NGN'
+        choices=[("NGN", "Naira"), ("USD", "Dollar"), ("EUR", "Euro")],
+        default="NGN",
     )
     balance = models.DecimalField(max_digits=12, decimal_places=2, default=100000.00)
     pin = models.CharField(max_length=128, blank=True, null=True)
@@ -59,10 +58,16 @@ class User(AbstractUser):
     is_verified = models.BooleanField(default=False)
     kyc_status = models.CharField(
         max_length=20,
-        choices=[('pending', 'Pending'), ('approved', 'Approved'), ('rejected', 'Rejected')],
-        default='pending'
+        choices=[
+            ("pending", "Pending"),
+            ("approved", "Approved"),
+            ("rejected", "Rejected"),
+        ],
+        default="pending",
     )
-    profile_picture = models.ImageField(upload_to='profile_pictures/', blank=True, null=True)
+    profile_picture = models.ImageField(
+        upload_to="profile_pictures/", blank=True, null=True
+    )
 
     # 🔐 Permissions / meta
     is_active = models.BooleanField(default=True)
@@ -72,8 +77,8 @@ class User(AbstractUser):
     date_joined = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['first_name', 'last_name', 'phone_number']
+    USERNAME_FIELD = "email"
+    REQUIRED_FIELDS = ["first_name", "last_name", "phone_number"]
     objects = CustomUserManager()
 
     def __str__(self):

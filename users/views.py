@@ -25,23 +25,23 @@ class RegisterUserView(generics.CreateAPIView):
             serializer.save()
             response = {
                 "message": "User registered successfully",
-                "data": serializer.data
+                "data": serializer.data,
             }
             return Response(data=response, status=status.HTTP_201_CREATED)
 
         else:
             response = {
                 "message": "User registration failed",
-                "data": serializer.errors
+                "data": serializer.errors,
             }
             return Response(data=response, status=status.HTTP_400_BAD_REQUEST)
-
 
 
 class UserLoginView(APIView):
     permission_classes = [AllowAny]
     throttle_classes = [ScopedRateThrottle]
-    throttle_scope = 'login'
+    throttle_scope = "login"
+
     def post(self, request):
         email = request.data.get("email")
         password = request.data.get("password")
@@ -51,27 +51,15 @@ class UserLoginView(APIView):
             tokens = create_jwt_pair(user)
             response = {
                 "message": "User Logged In Successfully",
-                "data": {
-                    "email": user.email,
-                    "tokens": tokens
-                }
+                "data": {"email": user.email, "tokens": tokens},
             }
             return Response(data=response, status=status.HTTP_200_OK)
-        response = {
-            "message": "Invalid Credentials"
-        }
+        response = {"message": "Invalid Credentials"}
         return Response(data=response, status=status.HTTP_401_UNAUTHORIZED)
 
     def get(self, request: Request):
-        content = {
-            "user": str(request.user),
-            "auth": str(request.auth)
-        }
+        content = {"user": str(request.user), "auth": str(request.auth)}
         return Response(data=content, status=status.HTTP_200_OK)
-
-
-
-
 
 
 class UserProfileView(APIView):
@@ -82,6 +70,6 @@ class UserProfileView(APIView):
         serializer = UserProfileSerializer(user, context={"request": request})
         response = {
             "message": "User profile fetched successfully",
-            "data": serializer.data
+            "data": serializer.data,
         }
         return Response(data=response, status=status.HTTP_200_OK)

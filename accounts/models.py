@@ -5,7 +5,6 @@ from users.models import User
 from django.contrib.auth.hashers import make_password, check_password
 
 
-
 class Wallet(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey("users.User", on_delete=models.CASCADE)

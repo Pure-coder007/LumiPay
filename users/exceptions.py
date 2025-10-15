@@ -3,6 +3,7 @@ from rest_framework.exceptions import Throttled
 from rest_framework.response import Response
 from rest_framework import status
 
+
 def custom_exception_handler(exc, context):
     # Call DRF’s default exception handler first
     response = exception_handler(exc, context)

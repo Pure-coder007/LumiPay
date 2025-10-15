@@ -34,7 +34,6 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-
     # Local apps
     "users",
     "security",
@@ -44,7 +43,6 @@ INSTALLED_APPS = [
     "cards",
     "providers",
     "payments",
-
     # Third-party apps
     "rest_framework",
     "rest_framework.authtoken",
@@ -52,39 +50,32 @@ INSTALLED_APPS = [
 
 
 REST_FRAMEWORK = {
-        "EXCEPTION_HANDLER": "rest_framework.views.exception_handler",
-        "NON_FIELD_ERRORS_KEY": "errors",
-
-        # for authentication
-        "DEFAULT_AUTHENTICATION_CLASSES": (
-            "rest_framework.authentication.SessionAuthentication",
-            "rest_framework.authentication.TokenAuthentication",
-            # for simple jwt authentication
-            "rest_framework_simplejwt.authentication.JWTAuthentication"
-        ),
-        # for permissions
-        "DEFAULT_PERMISSION_CLASSES":(
-            "rest_framework.permissions.IsAuthenticated",
-            # "rest_framework.permissions.AllowAny",
-        ),
-
+    "EXCEPTION_HANDLER": "rest_framework.views.exception_handler",
+    "NON_FIELD_ERRORS_KEY": "errors",
+    # for authentication
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework.authentication.SessionAuthentication",
+        "rest_framework.authentication.TokenAuthentication",
+        # for simple jwt authentication
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+    ),
+    # for permissions
+    "DEFAULT_PERMISSION_CLASSES": (
+        "rest_framework.permissions.IsAuthenticated",
+        # "rest_framework.permissions.AllowAny",
+    ),
     # 🚦 Throttling config
-        "DEFAULT_THROTTLE_CLASSES": [
-            "rest_framework.throttling.UserRateThrottle",
-            "rest_framework.throttling.AnonRateThrottle",
-        ],
-
-        "DEFAULT_THROTTLE_RATES": {
-            "anon": "5/minute",   # Unauthenticated users
-            "user": "10/minute",  # Authenticated users
-            "login": "3/minute",  # Custom for login endpoint
-        },
-
-        "EXCEPTION_HANDLER": "users.exceptions.custom_exception_handler",
+    "DEFAULT_THROTTLE_CLASSES": [
+        "rest_framework.throttling.UserRateThrottle",
+        "rest_framework.throttling.AnonRateThrottle",
+    ],
+    "DEFAULT_THROTTLE_RATES": {
+        "anon": "5/minute",  # Unauthenticated users
+        "user": "10/minute",  # Authenticated users
+        "login": "3/minute",  # Custom for login endpoint
+    },
+    "EXCEPTION_HANDLER": "users.exceptions.custom_exception_handler",
 }
-
-
-
 
 
 MIDDLEWARE = [
@@ -111,7 +102,6 @@ SIMPLE_JWT = {
 AUTH_USER_MODEL = "users.User"
 
 
-
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
@@ -136,7 +126,7 @@ WSGI_APPLICATION = "lumipay.wsgi.application"
 DATABASES = {
     "default": dj_database_url.config(
         default=config("DATABASE_URL"),  # Reads from .env
-        conn_max_age=600,                # Keeps DB connection alive for performance
+        conn_max_age=600,  # Keeps DB connection alive for performance
     )
 }
 
