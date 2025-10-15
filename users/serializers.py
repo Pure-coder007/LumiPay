@@ -1,6 +1,7 @@
 from django.db import transaction
 from rest_framework import serializers
 from .models import User
+from accounts.models import Wallet
 from rest_framework.exceptions import ValidationError
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.authtoken.models import Token
@@ -17,12 +18,14 @@ class RegisterUserSerializer(serializers.ModelSerializer):
     confirm_password = serializers.CharField(write_only=True, max_length=20, min_length=8)
     pin = serializers.CharField(write_only=True, min_length=4, max_length=6)
     confirm_pin = serializers.CharField(write_only=True, min_length=4, max_length=6)
+    nin = serializers.CharField(write_only=True, max_length=15)
+    bvn = serializers.CharField(write_only=True, max_length=15)
 
     class Meta:
         model = User
         fields = [
             'first_name', 'last_name', 'email', 'phone_number', 'account_number',
-            'password', 'confirm_password', 'pin', 'confirm_pin'
+            'password', 'confirm_password', 'pin', 'confirm_pin', 'nin', 'bvn'
         ]
 
     def validate(self, attrs):
@@ -38,7 +41,24 @@ class RegisterUserSerializer(serializers.ModelSerializer):
             raise ValidationError("PINs do not match")
         if len(attrs['pin']) != 6:
             raise ValidationError("PIN must be 6 characters long")
+        if not attrs['nin']:
+            raise ValidationError("NIN is required")
+        if User.objects.filter(nin=attrs['nin']).exists():
+            raise ValidationError("NIN already exists")
+        if not attrs['nin'].isnumeric():
+            raise ValidationError("NIN must be numeric")
+        if len(attrs['nin']) != 15:
+            raise ValidationError("NIN must be 15 characters long")
+        if not attrs['bvn']:
+            raise ValidationError("BVN is required")
+        if not attrs['bvn'].isnumeric():
+            raise ValidationError("BVN must be numeric")
+        if User.objects.filter(bvn=attrs['bvn']).exists():
+            raise ValidationError("BVN already exists")
+        if len(attrs['bvn']) != 15:
+            raise ValidationError("BVN must be 15 characters long")
         return attrs
+
 
     def create(self, validated_data):
         validated_data.pop('confirm_pin')
@@ -51,16 +71,24 @@ class RegisterUserSerializer(serializers.ModelSerializer):
                 user = User.objects.create(**validated_data)
                 user.set_password(password)
                 user.set_pin(pin)
+                user.set_nin(validated_data['nin'])
+                user.set_bvn(validated_data['bvn'])
                 user.account_number = User.objects.generate_account_number()
                 user.save()
+
+                # 2️⃣ Create wallet and assign same account number
+                Wallet.objects.create(
+                    user=user,
+                    account_number=user.account_number,
+                    balance=user.balance,
+                    bvn=user.bvn,
+
+
+                )
                 return user
         except Exception as e:
-            # Optional: log or raise a clear error
-            raise ValidationError(f"Registration failed: {str(e)}")
-
-
-
-
+                print(validated_data)
+                raise ValidationError(f"Registration failed: {str(e)}")
 
 
 class UserProfileSerializer(serializers.ModelSerializer):

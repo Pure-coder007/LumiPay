@@ -2,7 +2,9 @@ from datetime import timedelta
 from pathlib import Path
 from dotenv import load_dotenv
 from django.conf.global_settings import AUTH_USER_MODEL, SECRET_KEY
+from decouple import config
 import os
+import dj_database_url
 from rest_framework.permissions import IsAuthenticated
 
 
@@ -36,6 +38,12 @@ INSTALLED_APPS = [
     # Local apps
     "users",
     "security",
+    "accounts",
+    "transactions",
+    "bills",
+    "cards",
+    "providers",
+    "payments",
 
     # Third-party apps
     "rest_framework",
@@ -126,10 +134,10 @@ WSGI_APPLICATION = "lumipay.wsgi.application"
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
-    }
+    "default": dj_database_url.config(
+        default=config("DATABASE_URL"),  # Reads from .env
+        conn_max_age=600,                # Keeps DB connection alive for performance
+    )
 }
 
 

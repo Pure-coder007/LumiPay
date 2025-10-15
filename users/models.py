@@ -41,6 +41,8 @@ class User(AbstractUser):
     first_name = models.CharField(max_length=50, blank=False)
     last_name = models.CharField(max_length=50, blank=False)
     email = models.EmailField(unique=True, blank=False)
+    nin = models.CharField(max_length=128, blank=False, unique=True, null=False)
+    bvn = models.CharField(max_length=128, blank=False, unique=True, null=False)
     phone_number = models.CharField(max_length=15, blank=False, unique=True)
     account_number = models.CharField(max_length=10, unique=True, blank=False)
 
@@ -85,6 +87,23 @@ class User(AbstractUser):
 
     def set_pin(self, raw_pin):
         self.pin = make_password(raw_pin)
+
+    def set_bvn(self, *args, **kwargs):
+        if self.bvn and not self.bvn.startswith("pbkdf2_"):
+            self.bvn = make_password(self.bvn)
+
+    def set_nin(self, *args, **kwargs):
+        if self.nin and not self.nin.startswith("pbkdf2_"):
+            self.nin = make_password(self.nin)
+
+    def check_bvn(self, raw_bvn):
+        return check_password(raw_bvn, self.bvn)
+
+    def check_nin(self, raw_nin):
+        return check_password(raw_nin, self.nin)
+
+    def check_bvn(self, raw_bvn):
+        return check_password(raw_bvn, self.bvn)
 
     def check_pin(self, raw_pin):
         return check_password(raw_pin, self.pin)
