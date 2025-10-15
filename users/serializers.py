@@ -41,22 +41,35 @@ class RegisterUserSerializer(serializers.ModelSerializer):
             raise ValidationError("PINs do not match")
         if len(attrs['pin']) != 6:
             raise ValidationError("PIN must be 6 characters long")
-        if not attrs['nin']:
+            
+        # NIN validation
+        nin = attrs.get('nin')
+        if not nin:
             raise ValidationError("NIN is required")
-        if User.objects.filter(nin=attrs['nin']).exists():
-            raise ValidationError("NIN already exists")
-        if not attrs['nin'].isnumeric():
+        if not nin.isnumeric():
             raise ValidationError("NIN must be numeric")
-        if len(attrs['nin']) != 15:
+        if len(nin) != 15:
             raise ValidationError("NIN must be 15 characters long")
-        if not attrs['bvn']:
+            
+        # Check if NIN already exists by comparing hashes
+        for user in User.objects.all():
+            if user.check_nin(nin):
+                raise ValidationError("NIN already exists")
+        
+        # BVN validation
+        bvn = attrs.get('bvn')
+        if not bvn:
             raise ValidationError("BVN is required")
-        if not attrs['bvn'].isnumeric():
+        if not bvn.isnumeric():
             raise ValidationError("BVN must be numeric")
-        if User.objects.filter(bvn=attrs['bvn']).exists():
-            raise ValidationError("BVN already exists")
-        if len(attrs['bvn']) != 15:
+        if len(bvn) != 15:
             raise ValidationError("BVN must be 15 characters long")
+            
+        # Check if BVN already exists by comparing hashes
+        for user in User.objects.all():
+            if user.check_bvn(bvn):
+                raise ValidationError("BVN already exists")
+                
         return attrs
 
 
