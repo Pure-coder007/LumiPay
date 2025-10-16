@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    
     # Local apps
     "users",
     "security",
@@ -43,11 +44,14 @@ INSTALLED_APPS = [
     "cards",
     "providers",
     "payments",
+    
     # Third-party apps
     "rest_framework",
     "rest_framework.authtoken",
+    "rest_framework_simplejwt",
+    "corsheaders",
+    "django_q",
 ]
-
 
 REST_FRAMEWORK = {
     "EXCEPTION_HANDLER": "rest_framework.views.exception_handler",
@@ -56,7 +60,6 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework.authentication.SessionAuthentication",
         "rest_framework.authentication.TokenAuthentication",
-        # for simple jwt authentication
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
     # for permissions
@@ -131,6 +134,18 @@ DATABASES = {
 }
 
 
+# Email Configuration - Using console backend for testing
+# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 465
+EMAIL_USE_SSL = True
+EMAIL_HOST_USER = 'kingsleydike318@gmail.com'
+EMAIL_HOST_PASSWORD = 'your_app_password'  # Not your regular password!
+DEFAULT_FROM_EMAIL = f'LumiPay <{EMAIL_HOST_USER}>'
+
+
+
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
 
@@ -172,3 +187,5 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+

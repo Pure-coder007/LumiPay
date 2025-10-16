@@ -1,8 +1,11 @@
 from django.db import transaction
+from django.contrib.sites.shortcuts import get_current_site
+from django.urls import reverse
 from rest_framework import serializers
 from .models import User
 from accounts.models import Wallet
 from rest_framework.exceptions import ValidationError
+from .utils.email_utils import send_welcome_email
 
 
 class RegisterUserSerializer(serializers.ModelSerializer):
@@ -107,6 +110,16 @@ class RegisterUserSerializer(serializers.ModelSerializer):
                     balance=user.balance,
                     bvn=user.bvn,
                 )
+                
+                # Send welcome email
+                try:
+                    send_welcome_email(user)
+                except Exception as e:
+                    # Log the error but don't fail the registration
+                    import logging
+                    logger = logging.getLogger(__name__)
+                    logger.error(f"Failed to send welcome email: {str(e)}")
+                
                 return user
         except Exception as e:
             print(validated_data)
