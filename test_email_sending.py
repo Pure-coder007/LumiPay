@@ -24,7 +24,7 @@ print("=" * 32 + "\n")
 try:
     recipient = input("Enter your email address to receive the test: ").strip()
     if not recipient:
-        recipient = 'test@example.com'  # Fallback email
+        recipient = 'kingsleydike318@gmail.com'  # Fallback email
         print(f"Using default test email: {recipient}")
     
     print("\nSending test email...")
