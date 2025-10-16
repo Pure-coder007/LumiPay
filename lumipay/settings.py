@@ -134,15 +134,43 @@ DATABASES = {
 }
 
 
-# Email Configuration - Using console backend for testing
-# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+# ===== EMAIL CONFIGURATION =====
+# Mailtrap is used as the email testing service in development/staging environments.
+# It captures all outgoing emails without sending them to real recipients.
+# 
+# To set up Mailtrap:
+# 1. Sign up at https://mailtrap.io/
+# 2. Go to your Inbox and click 'Show Credentials'
+# 3. Add these to your .env file:
+#    MAILTRAP_USER=your_username_from_mailtrap
+#    MAILTRAP_PASSWORD=your_password_from_mailtrap
+
+# SMTP backend for sending emails
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 465
-EMAIL_USE_SSL = True
-EMAIL_HOST_USER = 'kingsleydike318@gmail.com'
-EMAIL_HOST_PASSWORD = 'your_app_password'  # Not your regular password!
-DEFAULT_FROM_EMAIL = f'LumiPay <{EMAIL_HOST_USER}>'
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_USE_SSL = False
+
+if not EMAIL_HOST_USER or not EMAIL_HOST_PASSWORD:
+    print("WARNING: Email credentials not found in environment variables. Emails will not be sent.")
+
+DEFAULT_FROM_EMAIL = 'noreply@lumipay.com'
+
+# # Mailtrap SMTP server settings
+# EMAIL_HOST = 'sandbox.smtp.mailtrap.io'  # Mailtrap's SMTP server
+# EMAIL_PORT = 2525
+# EMAIL_USE_TLS = True
+# EMAIL_USE_SSL = False
+
+
+# Email authentication
+# EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+# EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+
+
 
 
 
