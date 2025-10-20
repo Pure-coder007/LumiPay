@@ -76,6 +76,7 @@ REST_FRAMEWORK = {
         "anon": "5/minute",  # Unauthenticated users
         "user": "10/minute",  # Authenticated users
         "login": "3/minute",  # Custom for login endpoint
+        # "send_money": "1/minute",  # Custom for send money endpoint
     },
     "EXCEPTION_HANDLER": "users.exceptions.custom_exception_handler",
 }
