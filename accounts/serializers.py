@@ -2,6 +2,7 @@ from django.db import transaction
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from .models import User, Wallet, TransactionHistory
+from lumipay.tasks import send_transaction_email
 
 
 class SendMoneySerializer(serializers.ModelSerializer):
@@ -67,6 +68,12 @@ class SendMoneySerializer(serializers.ModelSerializer):
                 wallet=recipient_wallet,
                 amount=amount,
                 type="credit",
+            )
+            send_transaction_email.delay(
+                sender_wallet.user.email,
+                recipient_wallet.user.email,
+                str(amount),
+                debit_txn.transaction_id
             )
 
         return debit_txn
