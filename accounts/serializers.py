@@ -1,7 +1,8 @@
 from django.db import transaction
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
-from .models import User, Wallet, TransactionHistory
+from users.models import User
+from .models import Wallet, TransactionHistory
 from lumipay.tasks import send_transaction_email
 
 
@@ -64,18 +65,33 @@ class SendMoneySerializer(serializers.ModelSerializer):
             recipient_wallet.balance += amount
             recipient_wallet.save()
 
+            sender_user = sender_wallet.user
+            receiver_user = User.objects.get(account_number=recipient_wallet.account_number)
+
             # 2. Record both transactions
             debit_txn = TransactionHistory.objects.create(
                 wallet=sender_wallet,
                 amount=amount,
                 type="debit",
+                sender=sender_user,
+                receiver=receiver_user,
+                balance_after_transaction=sender_wallet.balance
             )
 
             TransactionHistory.objects.create(
                 wallet=recipient_wallet,
                 amount=amount,
                 type="credit",
+                sender=sender_user,
+                receiver=receiver_user,
+                balance_after_transaction=sender_wallet.balance
             )
+            # Update user balance
+            sender_wallet.user.balance = sender_wallet.balance
+            sender_wallet.user.save()
+            recipient_wallet.user.balance = recipient_wallet.balance
+            recipient_wallet.user.save()
+
             send_transaction_email.delay(
                 sender_wallet.user.email,
                 recipient_wallet.user.email,
@@ -84,3 +100,53 @@ class SendMoneySerializer(serializers.ModelSerializer):
             )
 
         return debit_txn
+
+
+
+# Get Transaction History
+class TransactionHistorySerializer(serializers.ModelSerializer):
+    sender_name = serializers.SerializerMethodField()
+    receiver_name = serializers.SerializerMethodField()
+    wallet_balance = serializers.SerializerMethodField()
+
+
+    class Meta:
+        model = TransactionHistory
+        fields = [
+            "transaction_id",
+            "session_id",
+            "amount",
+            "type",
+            "created_at",
+            "sender_name",
+            "receiver_name",
+            "wallet_balance",
+        ]
+
+    def get_wallet_balance(self, obj):
+        # Instead of current wallet balance, use stored balance after transaction
+        return obj.balance_after_transaction
+
+    def get_sender_name(self, obj):
+        sender = obj.sender
+        if not sender:
+            return None
+        # Prefer full name, else username or email
+        return (
+            f"{sender.first_name} {sender.last_name}".strip()
+            or sender.username
+            or sender.email
+        )
+
+    def get_receiver_name(self, obj):
+        receiver = obj.receiver
+        if not receiver:
+            return None
+        return (
+            f"{receiver.first_name} {receiver.last_name}".strip()
+            or receiver.username
+            or receiver.email
+        )
+
+
+
