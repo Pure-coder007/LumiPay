@@ -40,6 +40,9 @@ class SendMoneySerializer(serializers.ModelSerializer):
         except Wallet.DoesNotExist:
             raise ValidationError("Recipient wallet not found.")
 
+        if amount <= 100:
+            raise ValidationError("Amount must be greater than 100.")
+
         # 3. Self-transfer check
         if sender_wallet == recipient_wallet:
             raise ValidationError("You cannot send money to yourself.")
