@@ -2,11 +2,14 @@ amqp==5.3.1
 asgiref==3.9.1
 billiard==4.2.2
 black==25.1.0
+Brotli==1.1.0
 celery==5.5.3
+cffi==2.0.0
 click==8.2.1
 click-didyoumean==0.3.1
 click-plugins==1.1.1.2
 click-repl==0.3.0
+cssselect2==0.8.0
 dj-database-url==3.0.1
 Django==5.2.7
 django-cors-headers==4.8.0
@@ -17,6 +20,7 @@ django-restframework==0.0.1
 djangorestframework==3.16.1
 djangorestframework_simplejwt==5.5.1
 drf-yasg==1.21.7
+fonttools==4.60.1
 gunicorn==23.0.0
 inflection==0.5.1
 kombu==5.5.4
@@ -27,7 +31,10 @@ pillow==11.3.0
 platformdirs==4.4.0
 prompt_toolkit==3.0.52
 psycopg2-binary==2.9.10
+pycparser==2.23
+pydyf==0.11.0
 PyJWT==2.10.1
+pyphen==0.17.2
 python-dateutil==2.9.0.post0
 python-decouple==3.8
 python-dotenv==1.1.1
@@ -36,7 +43,12 @@ PyYAML==6.0.3
 redis==6.4.0
 six==1.17.0
 sqlparse==0.5.3
+tinycss2==1.4.0
+tinyhtml5==2.0.0
 tzdata==2025.2
 uritemplate==4.2.0
 vine==5.1.0
 wcwidth==0.2.14
+weasyprint==66.0
+webencodings==0.5.1
+zopfli==0.2.3.post1

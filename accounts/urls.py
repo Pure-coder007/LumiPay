@@ -8,5 +8,12 @@ from rest_framework_simplejwt.views import (
 
 urlpatterns = [
     path("send_money/", views.SendMoneyView.as_view(), name="send_money"),
-    path("transaction_history/", views.TransactionHistoryView.as_view(), name="transaction_history"),
+    path(
+        "transaction_history/",
+        views.TransactionHistoryView.as_view(),
+        name="transaction_history",
+    ),
+    path(
+        "statement/", views.DownloadStatementView.as_view(), name="download_statement"
+    ),
 ]

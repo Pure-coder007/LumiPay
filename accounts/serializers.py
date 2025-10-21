@@ -9,6 +9,7 @@ from lumipay.tasks import send_transaction_email
 class SendMoneySerializer(serializers.ModelSerializer):
     amount = serializers.DecimalField(max_digits=10, decimal_places=2)
     recipient = serializers.CharField(max_length=10)  # account number of recipient
+    narration = serializers.CharField(max_length=255, required=False, allow_blank=True, default='')
 
     class Meta:
         model = TransactionHistory
@@ -19,6 +20,7 @@ class SendMoneySerializer(serializers.ModelSerializer):
             "session_id",
             "type",
             "created_at",
+            "narration",
         ]
         read_only_fields = ["transaction_id", "session_id", "created_at", "type"]
 
@@ -27,6 +29,7 @@ class SendMoneySerializer(serializers.ModelSerializer):
         sender = request.user
         recipient_account = data.get("recipient")
         amount = data.get("amount")
+        narration = data.get("narration")
 
         # 1. Get sender’s wallet
         try:
@@ -60,6 +63,7 @@ class SendMoneySerializer(serializers.ModelSerializer):
         sender_wallet = validated_data["sender_wallet"]
         recipient_wallet = validated_data["recipient_wallet"]
         amount = validated_data["amount"]
+        narration = validated_data["narration"]
 
         with transaction.atomic():
             # 1. Update balances
@@ -69,7 +73,9 @@ class SendMoneySerializer(serializers.ModelSerializer):
             recipient_wallet.save()
 
             sender_user = sender_wallet.user
-            receiver_user = User.objects.get(account_number=recipient_wallet.account_number)
+            receiver_user = User.objects.get(
+                account_number=recipient_wallet.account_number
+            )
 
             # 2. Record both transactions
             debit_txn = TransactionHistory.objects.create(
@@ -78,7 +84,8 @@ class SendMoneySerializer(serializers.ModelSerializer):
                 type="debit",
                 sender=sender_user,
                 receiver=receiver_user,
-                balance_after_transaction=sender_wallet.balance
+                narration=narration,
+                balance_after_transaction=sender_wallet.balance,
             )
 
             TransactionHistory.objects.create(
@@ -87,7 +94,8 @@ class SendMoneySerializer(serializers.ModelSerializer):
                 type="credit",
                 sender=sender_user,
                 receiver=receiver_user,
-                balance_after_transaction=sender_wallet.balance
+                narration=narration,
+                balance_after_transaction=sender_wallet.balance,
             )
             # Update user balance
             sender_wallet.user.balance = sender_wallet.balance
@@ -105,13 +113,11 @@ class SendMoneySerializer(serializers.ModelSerializer):
         return debit_txn
 
 
-
 # Get Transaction History
 class TransactionHistorySerializer(serializers.ModelSerializer):
     sender_name = serializers.SerializerMethodField()
     receiver_name = serializers.SerializerMethodField()
     wallet_balance = serializers.SerializerMethodField()
-
 
     class Meta:
         model = TransactionHistory
@@ -124,6 +130,7 @@ class TransactionHistorySerializer(serializers.ModelSerializer):
             "sender_name",
             "receiver_name",
             "wallet_balance",
+            "narration",
         ]
 
     def get_wallet_balance(self, obj):
@@ -150,6 +157,3 @@ class TransactionHistorySerializer(serializers.ModelSerializer):
             or receiver.username
             or receiver.email
         )
-
-
-

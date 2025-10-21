@@ -1,0 +1,319 @@
+
+
+<!DOCTYPE html>
+{% load humanize %}
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Account Statement</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary: #2c3e50;
+      --secondary: #3498db;
+      --accent: #2980b9;
+      --light: #f8f9fa;
+      --dark: #2c3e50;
+      --success: #27ae60;
+      --danger: #e74c3c;
+      --warning: #f39c12;
+      --info: #17a2b8;
+      --border-radius: 8px;
+      --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f5f7fa;
+      color: #333;
+      line-height: 1.6;
+      padding: 20px;
+    }
+
+    .statement-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: white;
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
+      overflow: hidden;
+    }
+
+    .statement-header {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
+      padding: 30px;
+      text-align: center;
+    }
+
+    .statement-header h1 {
+      font-size: 28px;
+      margin-bottom: 10px;
+      font-weight: 600;
+    }
+
+    .statement-header p {
+      font-size: 16px;
+      opacity: 0.9;
+    }
+
+    .user-info {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      padding: 25px;
+      background-color: var(--light);
+      border-bottom: 1px solid #ddd;
+    }
+
+    .user-details {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .info-card {
+      background: white;
+      padding: 15px 20px;
+      border-radius: var(--border-radius);
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      min-width: 200px;
+    }
+
+    .info-card h3 {
+      font-size: 14px;
+      color: #7f8c8d;
+      margin-bottom: 5px;
+    }
+
+    .info-card p {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--dark);
+    }
+
+    .statement-summary {
+      display: flex;
+      justify-content: space-between;
+      padding: 20px 25px;
+      background: white;
+      border-bottom: 1px solid #eee;
+    }
+
+    .summary-item {
+      text-align: center;
+      flex: 1;
+    }
+
+    .summary-item h3 {
+      font-size: 14px;
+      color: #7f8c8d;
+      margin-bottom: 8px;
+    }
+
+    .summary-item .value {
+      font-size: 22px;
+      font-weight: 700;
+    }
+
+    .summary-item .credit {
+      color: var(--success);
+    }
+
+    .summary-item .debit {
+      color: var(--danger);
+    }
+
+    .transactions-section {
+      padding: 25px;
+    }
+
+    .section-title {
+      font-size: 20px;
+      margin-bottom: 20px;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .section-title i {
+      color: var(--secondary);
+    }
+
+    .transactions-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+
+    .transactions-table th {
+      background-color: var(--primary);
+      color: white;
+      padding: 15px 12px;
+      text-align: left;
+      font-weight: 600;
+    }
+
+    .transactions-table td {
+      padding: 15px 12px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .transactions-table tr:hover {
+      background-color: #f5f9ff;
+    }
+
+    .transaction-type {
+      display: inline-block;
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .type-credit {
+      background-color: rgba(39, 174, 96, 0.15);
+      color: var(--success);
+    }
+
+    .type-debit {
+      background-color: rgba(231, 76, 60, 0.15);
+      color: var(--danger);
+    }
+
+    .amount {
+      font-weight: 600;
+    }
+
+    .balance {
+      font-weight: 600;
+      color: var(--primary);
+    }
+
+    .footer {
+      padding: 20px 25px;
+      background-color: var(--light);
+      text-align: center;
+      color: #7f8c8d;
+      font-size: 14px;
+      border-top: 1px solid #ddd;
+    }
+
+    .print-btn {
+      display: inline-block;
+      background-color: var(--secondary);
+      color: white;
+      padding: 10px 20px;
+      border-radius: var(--border-radius);
+      text-decoration: none;
+      font-weight: 600;
+      margin-top: 15px;
+      transition: all 0.3s ease;
+    }
+
+    .print-btn:hover {
+      background-color: var(--accent);
+      transform: translateY(-2px);
+    }
+
+    @media (max-width: 768px) {
+      .user-info, .statement-summary {
+        flex-direction: column;
+        gap: 15px;
+      }
+
+      .transactions-table {
+        display: block;
+        overflow-x: auto;
+      }
+
+      .info-card {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="statement-container">
+    <div class="statement-header">
+      <h1><i class="fas fa-file-invoice-dollar"></i> Account Statement</h1>
+      <p>Detailed transaction history for your account</p>
+    </div>
+
+    <div class="user-info">
+      <div class="user-details">
+        <div class="info-card">
+          <h3>Account Holder</h3>
+          <p>{{ user.first_name }} {{ user.last_name }}</p>
+        </div>
+        <div class="info-card">
+          <h3>Account Number</h3>
+          <p>{{ user.account_number }}</p>
+        </div>
+        <div class="info-card">
+          <h3>Currency</h3>
+          <p>{{ user.currency }}</p>
+        </div>
+      </div>
+      <div class="info-card">
+        <h3>Generated On</h3>
+        <p>{{ date }}</p>
+      </div>
+    </div>
+
+    <div class="transactions-section">
+      <h2 class="section-title"><i class="fas fa-exchange-alt"></i> Transaction History</h2>
+
+      <table class="transactions-table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Type</th>
+            <th>Amount</th>
+            <th>Balance After Transaction</th>
+            <th>Recipient/Sender</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for txn in transactions %}
+          <tr>
+            <td>{{ txn.created_at|date:"d M Y H:i" }}</td>
+            <td>
+              {% if txn.type == "debit" %}
+                <span class="transaction-type type-debit">{{ txn.type|title }}</span>
+              {% else %}
+                <span class="transaction-type type-credit">{{ txn.type|title }}</span>
+              {% endif %}
+            </td>
+            <td class="amount">₦{{ txn.amount|floatformat:2|intcomma }}</td>
+            <td class="balance">₦{{ txn.balance_after_transaction|floatformat:2|intcomma }}</td>
+            <td>
+              {% if txn.type == "debit" %}
+                {{ txn.receiver.first_name }} {{ txn.receiver.last_name }}
+              {% else %}
+                {{ txn.sender.first_name }} {{ txn.sender.last_name }}
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="footer">
+      <p>This statement was generated electronically on {{ date }}</p>
+      <p>For inquiries, please contact customer service</p>
+      <a href="#" class="print-btn"><i class="fas fa-print"></i> Print Statement</a>
+    </div>
+  </div>
+</body>
+</html>
