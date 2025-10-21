@@ -281,6 +281,7 @@
             <th>Amount</th>
             <th>Balance After Transaction</th>
             <th>Recipient/Sender</th>
+            <th>Narration</th>
           </tr>
         </thead>
         <tbody>
@@ -303,6 +304,7 @@
                 {{ txn.sender.first_name }} {{ txn.sender.last_name }}
               {% endif %}
             </td>
+            <td>{{ txn.narration }}</td>
           </tr>
           {% endfor %}
         </tbody>
