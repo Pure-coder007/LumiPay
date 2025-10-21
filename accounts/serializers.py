@@ -128,7 +128,7 @@ class TransactionHistorySerializer(serializers.ModelSerializer):
 
     def get_wallet_balance(self, obj):
         # Instead of current wallet balance, use stored balance after transaction
-        return obj.balance_after_transaction
+        return "₦{:,.2f}".format(obj.balance_after_transaction)
 
     def get_sender_name(self, obj):
         sender = obj.sender
