@@ -103,26 +103,28 @@ class RegisterUserSerializer(serializers.ModelSerializer):
                 user.account_number = User.objects.generate_account_number()
                 user.save()
 
-
                 Wallet.objects.create(
                     user=user,
                     account_number=user.account_number,
                     balance=user.balance,
                     bvn=user.bvn,
                 )
-                
+
                 # Send welcome email
                 try:
                     send_welcome_email(user)
                 except Exception as e:
                     # Log the error but don't fail the registration
                     import logging
+
                     logger = logging.getLogger(__name__)
-                    error_msg = f"Failed to send welcome email to {user.email}: {str(e)}"
+                    error_msg = (
+                        f"Failed to send welcome email to {user.email}: {str(e)}"
+                    )
                     logger.error(error_msg, exc_info=True)
                     # Print to console for better visibility in development
                     print(f"\n=== EMAIL ERROR ===\n{error_msg}\n==============\n")
-                
+
                 return user
         except Exception as e:
             print(validated_data)

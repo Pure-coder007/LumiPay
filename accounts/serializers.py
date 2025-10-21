@@ -11,7 +11,14 @@ class SendMoneySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = TransactionHistory
-        fields = ["amount", "recipient", "transaction_id", "session_id", "type", "created_at"]
+        fields = [
+            "amount",
+            "recipient",
+            "transaction_id",
+            "session_id",
+            "type",
+            "created_at",
+        ]
         read_only_fields = ["transaction_id", "session_id", "created_at", "type"]
 
     def validate(self, data):
@@ -73,7 +80,7 @@ class SendMoneySerializer(serializers.ModelSerializer):
                 sender_wallet.user.email,
                 recipient_wallet.user.email,
                 str(amount),
-                debit_txn.transaction_id
+                debit_txn.transaction_id,
             )
 
         return debit_txn
