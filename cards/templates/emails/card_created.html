@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Your New LumiPay Card is Ready!</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            text-align: center;
+            padding: 20px 0;
+            background-color: #4a6baf;
+            color: white;
+            border-radius: 5px 5px 0 0;
+        }
+        .content {
+            padding: 20px;
+            background-color: #f9f9f9;
+            border: 1px solid #e0e0e0;
+            border-top: none;
+            border-radius: 0 0 5px 5px;
+        }
+        .card-details {
+            background-color: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        .footer {
+            margin-top: 20px;
+            font-size: 12px;
+            color: #777777;
+            text-align: center;
+        }
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #4a6baf;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Your New LumiPay Card is Ready!</h1>
+    </div>
+    
+    <div class="content">
+        <p>Hello {{ user.first_name|default:user.username }},</p>
+        
+        <p>We're excited to inform you that your new {{ card.card_type }} card has been successfully created!</p>
+        
+        <div class="card-details">
+            <h3>Card Details</h3>
+            <p><strong>Card Type:</strong> {{ card.card_type }}</p>
+            <p><strong>Card Number:</strong> •••• •••• •••• {{ card.last_four }}</p>
+            <p><strong>Expiry Date:</strong> {{ card.expiry_date }}</p>
+            <p><strong>Daily Spending Limit:</strong> {{ card.daily_limit }}</p>
+            <p><strong>Current Balance:</strong> {{ card.balance }}</p>
+            <p><strong>Card Creation Fee:</strong> {{ card.creation_fee }}</p>
+        </div>
+        
+        <p>Your card is now ready to use for online and in-store purchases wherever {{ card.card_type }} is accepted.</p>
+        
+        <p>For security reasons, please remember to:</p>
+        <ul>
+            <li>Never share your card PIN with anyone</li>
+            <li>Keep your card details secure</li>
+            <li>Report any suspicious activity immediately</li>
+        </ul>
+        
+        <p>If you did not request this card, please contact our support team immediately at <a href="mailto:{{ support_email }}">{{ support_email }}</a>.</p>
+        
+        <p>Thank you for choosing {{ app_name }}!</p>
+        
+        <p>Best regards,<br>The {{ app_name }} Team</p>
+    </div>
+    
+    <div class="footer">
+        <p>© {% now "Y" %} {{ app_name }}. All rights reserved.</p>
+        <p>This is an automated message, please do not reply to this email.</p>
+    </div>
+</body>
+</html>

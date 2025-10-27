@@ -171,3 +171,6 @@ CELERY_ACCEPT_CONTENT = ["json"]
 CELERY_TASK_SERIALIZER = "json"
 CELERY_RESULT_SERIALIZER = "json"
 CELERY_TIMEZONE = "Africa/Lagos"
+
+# Card settings
+CARD_CREATION_FEE = 1000.00  # N1000 card creation fee
