@@ -16,4 +16,5 @@ urlpatterns = [
     path(
         "statement/", views.DownloadStatementView.as_view(), name="download_statement"
     ),
+    path("top_up/", views.TopUpWalletView.as_view(), name="top_up_wallet")
 ]

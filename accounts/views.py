@@ -13,7 +13,7 @@ from datetime import datetime
 from django.template.loader import render_to_string
 from accounts.models import TransactionHistory
 from users.models import User
-from .serializers import SendMoneySerializer, TransactionHistorySerializer
+from .serializers import SendMoneySerializer, TransactionHistorySerializer, TopUpWalletSerializer
 from .models import TransactionHistory
 # from rest_framework.authentication import SessionAuthentication, TokenAuthentication
 
@@ -127,3 +127,27 @@ class DownloadStatementView(APIView):
         response = HttpResponse(pdf_file, content_type='application/pdf')
         response['Content-Disposition'] = f'attachment; filename="statement_{user.account_number}.pdf"'
         return response
+
+
+class TopUpWalletView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        serializer = TopUpWalletSerializer(data=request.data)
+        if serializer.is_valid():
+            wallet = serializer.save()
+            response = {
+                "message": "Wallet topped up successfully",
+                "data": {
+                    "account_number": wallet.account_number,
+                    "new_balance": f"₦{wallet.balance:,.2f}",
+                    "currency": "NGN"
+                }
+            }
+            return Response(data=response, status=status.HTTP_200_OK)
+        else:
+            response = {
+                "message": "Validation error",
+                "data": serializer.errors,
+            }
+            return Response(data=response, status=status.HTTP_400_BAD_REQUEST)

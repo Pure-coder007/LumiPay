@@ -157,3 +157,34 @@ class TransactionHistorySerializer(serializers.ModelSerializer):
             or receiver.username
             or receiver.email
         )
+
+
+
+
+
+# Top up wallet serializer
+class TopUpWalletSerializer(serializers.ModelSerializer):
+    amount = serializers.DecimalField(max_digits=10, decimal_places=2, write_only=True)
+    account_number = serializers.CharField(write_only=True)
+
+    class Meta:
+        model = Wallet
+        fields = ["amount", "account_number"]
+        read_only_fields = ["balance"]  # Make balance read-only
+
+    def validate_amount(self, value):
+        if value <= 99:
+            raise serializers.ValidationError("You must deposit at least ₦100")
+        return value
+    def create(self, validated_data):
+        account_number = validated_data.pop('account_number')
+        amount = validated_data.pop('amount')
+
+        try:
+            wallet = Wallet.objects.get(account_number=account_number)
+            with transaction.atomic():
+                wallet.balance += amount
+                wallet.save()
+                return wallet
+        except Wallet.DoesNotExist:
+            raise serializers.ValidationError({"account_number": "Wallet not found"})

@@ -132,6 +132,8 @@ class RegisterUserSerializer(serializers.ModelSerializer):
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
+    balance = serializers.SerializerMethodField()
+    
     class Meta:
         model = User
         fields = [
@@ -153,8 +155,14 @@ class UserProfileSerializer(serializers.ModelSerializer):
         read_only_fields = [
             "email",
             "account_number",
-            "balance",
             "currency",
             "date_joined",
             "updated_at",
         ]
+    
+    def get_balance(self, obj):
+        try:
+            wallet = Wallet.objects.get(user=obj)
+            return wallet.balance
+        except Wallet.DoesNotExist:
+            return 0

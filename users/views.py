@@ -68,8 +68,14 @@ class UserProfileView(APIView):
     def get(self, request: Request):
         user = request.user
         serializer = UserProfileSerializer(user, context={"request": request})
+        response_data = dict(serializer.data)
+
+        # Format the balance if it exists in the response
+        if 'balance' in response_data and response_data['balance'] is not None:
+            response_data['balance'] = f"₦{float(response_data['balance']):,.2f}"
+
         response = {
             "message": "User profile fetched successfully",
-            "data": serializer.data,
+            "data": response_data,
         }
         return Response(data=response, status=status.HTTP_200_OK)
